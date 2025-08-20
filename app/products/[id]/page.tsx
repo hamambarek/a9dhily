@@ -31,6 +31,7 @@ interface Product {
   description: string
   price: number
   currency: string
+  category: string
   condition: string
   location: string
   country: string
@@ -202,8 +203,19 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Images */}
           <div className="space-y-4">
-            <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-              <div className="text-gray-400 text-lg">Product Image</div>
+            {/* Main Image */}
+            <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+              {product.images && product.images.length > 0 ? (
+                <img
+                  src={product.images[selectedImage]}
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-gray-400 text-lg">No Image Available</div>
+                </div>
+              )}
             </div>
             
             {/* Image Gallery */}
@@ -213,11 +225,15 @@ export default function ProductDetailPage() {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center ${
+                    className={`aspect-square bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden ${
                       selectedImage === index ? 'ring-2 ring-blue-500' : ''
                     }`}
                   >
-                    <div className="text-gray-400 text-sm">Image {index + 1}</div>
+                    <img
+                      src={image}
+                      alt={`${product.title} - Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -255,6 +271,9 @@ export default function ProductDetailPage() {
                 <Badge variant={product.condition === 'NEW' ? 'default' : 'secondary'}>
                   {product.condition}
                 </Badge>
+                <Badge variant="outline">
+                  {product.category}
+                </Badge>
                 <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                   <Eye className="h-4 w-4 mr-1" />
                   {product.viewCount} views
@@ -266,7 +285,7 @@ export default function ProductDetailPage() {
               </div>
 
               <div className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                ${product.price}
+                {product.currency === 'USD' ? '$' : product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : product.currency}{product.price}
               </div>
             </div>
 
@@ -278,6 +297,31 @@ export default function ProductDetailPage() {
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 {product.description}
               </p>
+            </div>
+
+            {/* Product Details */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Product Details
+              </h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Category:</span>
+                  <span className="ml-2 font-medium">{product.category}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Condition:</span>
+                  <span className="ml-2 font-medium">{product.condition}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Location:</span>
+                  <span className="ml-2 font-medium">{product.location}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">City:</span>
+                  <span className="ml-2 font-medium">{product.city}, {product.country}</span>
+                </div>
+              </div>
             </div>
 
             {/* Seller Information */}
@@ -320,7 +364,7 @@ export default function ProductDetailPage() {
                 size="lg"
               >
                 <CreditCard className="h-5 w-5 mr-2" />
-                Buy Now - ${product.price}
+                Buy Now - {product.currency === 'USD' ? '$' : product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : product.currency}{product.price}
               </Button>
               
               <div className="grid grid-cols-2 gap-4">
