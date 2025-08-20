@@ -74,7 +74,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
       },
     })
 
-    // Update product status if needed
+    // Update product status to sold
     await db.product.update({
       where: { id: productId },
       data: { isSold: true },
