@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: a9dhily-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: a9dhily
+      POSTGRES_USER: a9dhily_user
+      POSTGRES_PASSWORD: a9dhily_password_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - a9dhily-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U a9dhily_user -d a9dhily"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: a9dhily-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@a9dhily.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password_2024
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - a9dhily-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  a9dhily-network:
+    driver: bridge

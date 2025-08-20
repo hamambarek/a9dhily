@@ -186,6 +186,7 @@ model Message {
 
 model Review {
   id            String    @id @default(cuid())
+  productId     String
   transactionId String    @unique
   reviewerId    String
   reviewedId    String
@@ -195,9 +196,11 @@ model Review {
   createdAt     DateTime  @default(now())
 
   // Relations
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   reviewer      User      @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   reviewed      User      @relation("ReceivedReviews", fields: [reviewedId], references: [id], onDelete: Cascade)
 
+  @@index([productId])
   @@index([reviewerId])
   @@index([reviewedId])
   @@index([rating])
