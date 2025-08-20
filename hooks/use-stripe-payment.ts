@@ -70,47 +70,35 @@ export function useStripePayment() {
     setIsLoading(true)
 
     try {
-      // Create payment intent
-      const intentResult = await createPaymentIntent(paymentData)
-      
-      if (!intentResult.success) {
-        throw new Error(intentResult.error)
-      }
-
-      // Load Stripe
-      const stripe = await stripePromise
-      if (!stripe) {
-        throw new Error('Failed to load Stripe')
-      }
-
-      // Redirect to Stripe Checkout
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: 'Product Purchase',
-              },
-              unit_amount: Math.round(paymentData.amount * 100),
-            },
-            quantity: 1,
-          },
-        ],
-        mode: 'payment',
-        success_url: `${window.location.origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/payment/cancel`,
-        client_reference_id: intentResult.transactionId,
+      // Create checkout session
+      const response = await fetch('/api/payments/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...paymentData,
+          productName: 'Test Product Purchase',
+        }),
       })
 
-      if (error) {
-        throw new Error(error.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session')
+      }
+
+      if (!data.url) {
+        throw new Error('No checkout URL received')
       }
 
       // Success callback
-      if (onSuccess && intentResult.transactionId) {
-        onSuccess(intentResult.transactionId)
+      if (onSuccess && data.transactionId) {
+        onSuccess(data.transactionId)
       }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Payment failed'
