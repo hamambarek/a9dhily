@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import { Button } from '@/components/ui/button'
@@ -19,7 +19,8 @@ import {
   CreditCard,
   ArrowLeft,
   Heart,
-  Share2
+  Share2,
+  MessageSquare
 } from 'lucide-react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
@@ -50,6 +51,7 @@ interface Product {
 
 export default function ProductDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const { data: session } = useSession()
   const { toast } = useToast()
   const [product, setProduct] = useState<Product | null>(null)
@@ -368,9 +370,19 @@ export default function ProductDetailPage() {
               </Button>
               
               <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" className="h-12">
-                  <Truck className="h-4 w-4 mr-2" />
-                  Shipping Info
+                <Button 
+                  variant="outline" 
+                  className="h-12"
+                  onClick={() => {
+                    if (session?.user?.id === product.seller.id) {
+                      toast({ title: 'Cannot message yourself', description: 'You cannot send a message to yourself', variant: 'destructive' })
+                    } else {
+                      router.push(`/messages/start?receiverId=${product.seller.id}&productId=${product.id}`)
+                    }
+                  }}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Message Seller
                 </Button>
                 <Button variant="outline" className="h-12">
                   <Shield className="h-4 w-4 mr-2" />
