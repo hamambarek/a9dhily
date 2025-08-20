@@ -22,8 +22,8 @@ export default function PaymentTestPage() {
   const [amount, setAmount] = useState('10.00')
   const [productName, setProductName] = useState('Test Product')
 
-  // Mock seller ID for testing
-  const mockSellerId = 'seller_123'
+  // Mock seller ID for testing (using seeded data)
+  const mockSellerId = 'cmek6fukv0001143ogxfrmw6l' // Test seller from seeded data
   const mockProductId = 'prod_test_123'
 
   if (status === 'loading') {
