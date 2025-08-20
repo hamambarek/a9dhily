@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -82,6 +82,15 @@ export function ProductForm({ onSubmit, isLoading = false, initialData, isEditin
       city: initialData?.city || '',
     },
   })
+
+  // Set default values for select components when editing
+  useEffect(() => {
+    if (initialData && isEditing) {
+      setValue('currency', initialData.currency || 'USD')
+      setValue('category', initialData.category || '')
+      setValue('condition', initialData.condition || 'NEW')
+    }
+  }, [initialData, isEditing, setValue])
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
