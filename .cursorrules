@@ -1,0 +1,24 @@
+{
+  "rules": [
+    "Follow TypeScript best practices and maintain strict type safety",
+    "Use Tailwind CSS for styling with consistent design patterns",
+    "Implement proper error handling and loading states",
+    "Follow Next.js 14+ App Router conventions",
+    "Use Prisma for all database operations",
+    "Implement proper authentication and authorization",
+    "Follow accessibility guidelines (WCAG 2.1)",
+    "Write comprehensive tests for all new features",
+    "Use tRPC for type-safe API development",
+    "Follow the established component architecture",
+    "Use Shadcn/ui components for consistent UI",
+    "Implement responsive design for all components",
+    "Add proper JSDoc comments for complex functions",
+    "Use semantic HTML elements",
+    "Implement proper form validation",
+    "Follow security best practices for user data",
+    "Use environment variables for configuration",
+    "Implement proper loading and error boundaries",
+    "Use React hooks appropriately",
+    "Follow the established file naming conventions"
+  ]
+}
