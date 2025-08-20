@@ -25,6 +25,7 @@ import {
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/hooks/use-toast'
+import { ReviewsList } from '@/components/reviews/reviews-list'
 
 interface Product {
   id: string
@@ -58,10 +59,13 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
 
   useEffect(() => {
     if (params.id) {
       fetchProduct(params.id as string)
+      fetchReviews(params.id as string)
     }
   }, [params.id])
 
@@ -81,6 +85,22 @@ export default function ProductDetailPage() {
       setError('Failed to load product')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchReviews = async (productId: string) => {
+    try {
+      setReviewsLoading(true)
+      const response = await fetch(`/api/reviews?productId=${productId}`)
+      const data = await response.json()
+
+      if (data.success) {
+        setReviews(data.reviews)
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error)
+    } finally {
+      setReviewsLoading(false)
     }
   }
 
@@ -414,6 +434,34 @@ export default function ProductDetailPage() {
                   <span>Quality Guarantee</span>
                 </div>
               </div>
+            </div>
+
+            {/* Reviews Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Customer Reviews
+                </h3>
+                <div className="flex items-center space-x-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {reviews.length} reviews
+                  </span>
+                </div>
+              </div>
+              
+              {reviewsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 bg-blue-600 rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                <ReviewsList
+                  reviews={reviews}
+                  sellerId={product.seller.id}
+                  currentUserId={session?.user?.id}
+                  onReviewUpdate={() => fetchReviews(product.id)}
+                />
+              )}
             </div>
           </div>
         </div>

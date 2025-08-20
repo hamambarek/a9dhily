@@ -53,6 +53,8 @@ model User {
   isVerified    Boolean   @default(false)
   isActive      Boolean   @default(true)
   role          UserRole  @default(USER)
+  averageRating Decimal?  @db.Decimal(3, 2) // Average rating from reviews
+  totalReviews  Int       @default(0)       // Total number of reviews received
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -201,8 +203,12 @@ model Review {
   reviewedId    String
   rating        Int       // 1-5 stars
   comment       String?
+  sellerResponse String?  // Seller's response to the review
   isPublic      Boolean   @default(true)
+  isVerified    Boolean   @default(false) // Verified purchase review
+  helpfulCount  Int       @default(0)     // Number of helpful votes
   createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
   product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -213,6 +219,8 @@ model Review {
   @@index([reviewerId])
   @@index([reviewedId])
   @@index([rating])
+  @@index([isVerified])
+  @@index([createdAt])
 }
 
 model Notification {
