@@ -38,11 +38,11 @@ command_exists() {
 run_security_checks() {
     print_status "Running security checks..."
     
-    if command_exists npm; then
-        npm run security:check
+    if command_exists pnpm; then
+        pnpm run security:check
         print_success "Security checks completed"
     else
-        print_error "npm not found. Please install Node.js and npm."
+        print_error "pnpm not found. Please install pnpm: npm install -g pnpm"
         exit 1
     fi
 }
@@ -51,11 +51,11 @@ run_security_checks() {
 run_tests() {
     print_status "Running tests..."
     
-    if command_exists npm; then
-        npm run test
+    if command_exists pnpm; then
+        pnpm run test
         print_success "Tests completed"
     else
-        print_error "npm not found. Please install Node.js and npm."
+        print_error "pnpm not found. Please install pnpm: npm install -g pnpm"
         exit 1
     fi
 }
@@ -64,11 +64,11 @@ run_tests() {
 run_linting() {
     print_status "Running linting..."
     
-    if command_exists npm; then
-        npm run lint
+    if command_exists pnpm; then
+        pnpm run lint
         print_success "Linting completed"
     else
-        print_error "npm not found. Please install Node.js and npm."
+        print_error "pnpm not found. Please install pnpm: npm install -g pnpm"
         exit 1
     fi
 }

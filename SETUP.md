@@ -184,27 +184,33 @@ ALLOWED_FILE_TYPES="image/jpeg,image/png,image/webp,application/pdf"
 
 ## 🚀 Step 3: Install Dependencies
 
+First, install pnpm if you haven't already:
 ```bash
-npm install
+npm install -g pnpm
+```
+
+Then install project dependencies:
+```bash
+pnpm install
 ```
 
 ## 🗄️ Step 4: Database Migration
 
 ```bash
 # Generate Prisma client
-npx prisma generate
+pnpm db:generate
 
 # Run database migrations
-npx prisma db push
+pnpm db:push
 
 # (Optional) View database in Prisma Studio
-npx prisma studio
+pnpm db:studio
 ```
 
 ## 🧪 Step 5: Run Development Server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Your application will be available at: http://localhost:3000
@@ -214,7 +220,7 @@ Your application will be available at: http://localhost:3000
 1. **Database**: Check pgAdmin at http://localhost:8080
 2. **Application**: Visit http://localhost:3000
 3. **API Health**: Visit http://localhost:3000/api/health
-4. **Database Studio**: Run `npx prisma studio`
+4. **Database Studio**: Run `pnpm db:studio`
 
 ## 🛠️ Development Workflow
 
@@ -261,10 +267,10 @@ docker-compose logs postgres
 ### Environment Variable Issues
 ```bash
 # Validate environment variables
-npm run validate:env
+pnpm validate:env
 
 # Check for missing variables
-npm run check:env
+pnpm check:env
 ```
 
 ### Port Conflicts

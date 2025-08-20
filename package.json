@@ -16,24 +16,21 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:visual": "playwright test --grep @visual",
-    "check": "npm run lint && npm run type-check && npm run format:check",
-    "security:audit": "npm audit --audit-level=moderate",
-    "security:fix": "npm audit fix",
-    "security:check": "npm run security:audit && npm run type-check",
+    "check": "pnpm lint && pnpm type-check && pnpm format:check",
+    "security:audit": "pnpm audit --audit-level=moderate",
+    "security:fix": "pnpm audit --fix",
+    "security:check": "pnpm security:audit && pnpm type-check",
     "validate:env": "node -e \"require('dotenv').config(); console.log('✅ Environment variables loaded successfully')\"",
     "check:env": "node scripts/check-env.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:reset": "prisma db push --force-reset",
+    "db:seed": "tsx prisma/seed.ts",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -119,8 +116,9 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "pnpm": ">=8.0.0"
   },
+  "packageManager": "pnpm@8.15.0",
   "keywords": [
     "marketplace",
     "peer-to-peer",
