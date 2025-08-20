@@ -120,6 +120,8 @@ model Transaction {
   status          TransactionStatus @default(PENDING)
   paymentMethod   String?
   paymentIntentId String?           @unique
+  paidAt          DateTime?
+  failedAt        DateTime?
   escrowAccountId String?
   shippingAddress String?
   trackingNumber  String?
