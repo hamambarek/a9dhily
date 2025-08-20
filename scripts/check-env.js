@@ -48,7 +48,8 @@ const requiredVars = {
   payment: [
     // Optional - will show warnings if not set
     'STRIPE_PUBLISHABLE_KEY',
-    'STRIPE_SECRET_KEY'
+    'STRIPE_SECRET_KEY',
+    'STRIPE_WEBHOOK_SECRET'
   ],
   storage: [
     // Optional - will show warnings if not set
@@ -107,6 +108,10 @@ const validators = {
     return value && (value.startsWith('pk_') || value.startsWith('sk_'));
   },
   
+  stripeWebhookSecret: (value) => {
+    return value && value.startsWith('whsec_');
+  },
+  
   awsKey: (value) => {
     return value && value.length >= 20;
   }
@@ -156,6 +161,9 @@ function checkEnvironment() {
       } else if (varName.includes('STRIPE') && varName.includes('KEY')) {
         isValid = validators.stripeKey(value);
         validationMessage = ' (should start with pk_ or sk_)';
+      } else if (varName === 'STRIPE_WEBHOOK_SECRET') {
+        isValid = validators.stripeWebhookSecret(value);
+        validationMessage = ' (should start with whsec_)';
       } else if (varName.includes('AWS') && varName.includes('KEY')) {
         isValid = validators.awsKey(value);
         validationMessage = ' (should be at least 20 characters)';

@@ -13,7 +13,8 @@ import {
   Settings,
   LogOut,
   Sun,
-  Moon
+  Moon,
+  CreditCard
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
@@ -86,6 +87,12 @@ export function Navigation() {
                   <Button variant="ghost" size="sm">
                     <User className="h-5 w-5 mr-2" />
                     Dashboard
+                  </Button>
+                </Link>
+                <Link href="/payment-test">
+                  <Button variant="ghost" size="sm">
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    Test Payment
                   </Button>
                 </Link>
                 <Link href="/messages">
@@ -170,6 +177,12 @@ export function Navigation() {
                     <Button variant="ghost" className="w-full justify-start">
                       <User className="h-5 w-5 mr-2" />
                       Dashboard
+                    </Button>
+                  </Link>
+                  <Link href="/payment-test">
+                    <Button variant="ghost" className="w-full justify-start">
+                      <CreditCard className="h-5 w-5 mr-2" />
+                      Test Payment
                     </Button>
                   </Link>
                   <Link href="/messages">
