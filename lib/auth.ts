@@ -37,20 +37,37 @@ declare module 'next-auth' {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
-        role: user.role,
+        id: token.id as string,
+        role: token.role as string,
       },
     }),
     jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id
-        token.role = user.role
+        token.role = user.role || 'USER'
       }
       return token
+    },
+    signIn: async ({ user, account, profile }) => {
+      // Ensure new users have a role
+      if (account?.provider === 'google') {
+        const existingUser = await db.user.findUnique({
+          where: { email: user.email! },
+        })
+        
+        if (existingUser && !existingUser.role) {
+          // Update existing user without role
+          await db.user.update({
+            where: { email: user.email! },
+            data: { role: 'USER' },
+          })
+        }
+      }
+      return true
     },
   },
   adapter: PrismaAdapter(db),
@@ -98,7 +115,6 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: '/auth/signin',
-    signUp: '/auth/signup',
     error: '/auth/error',
   },
   session: {
