@@ -45,8 +45,8 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('')
-  const [condition, setCondition] = useState('')
+  const [category, setCategory] = useState('all')
+  const [condition, setCondition] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const categories = [
@@ -80,8 +80,8 @@ export default function ProductsPage() {
       setLoading(true)
       const params = new URLSearchParams()
       if (search) params.append('search', search)
-      if (category) params.append('category', category)
-      if (condition) params.append('condition', condition)
+      if (category && category !== 'all') params.append('category', category)
+      if (condition && condition !== 'all') params.append('condition', condition)
 
       const response = await fetch(`/api/products?${params.toString()}`)
       const data = await response.json()
@@ -143,7 +143,7 @@ export default function ProductsPage() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
@@ -157,7 +157,7 @@ export default function ProductsPage() {
                   <SelectValue placeholder="Condition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Conditions</SelectItem>
+                  <SelectItem value="all">All Conditions</SelectItem>
                   {conditions.map((cond) => (
                     <SelectItem key={cond.value} value={cond.value}>
                       {cond.label}
