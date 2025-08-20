@@ -1,8 +1,13 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Search, 
   Filter, 
@@ -10,70 +15,87 @@ import {
   List,
   MapPin,
   Star,
-  Eye
+  Eye,
+  Plus,
+  Loader2
 } from 'lucide-react'
+import Link from 'next/link'
+
+interface Product {
+  id: string
+  title: string
+  description: string
+  price: number
+  currency: string
+  condition: string
+  location: string
+  country: string
+  images: string[]
+  viewCount: number
+  createdAt: string
+  seller: {
+    id: string
+    name: string
+    country: string
+    city: string
+    isVerified: boolean
+  }
+}
 
 export default function ProductsPage() {
-  // Mock data - in real app this would come from tRPC
-  const products = [
-    {
-      id: '1',
-      title: 'iPhone 15 Pro Max',
-      description: 'Latest iPhone with advanced camera system and titanium design',
-      price: 1199,
-      currency: 'USD',
-      condition: 'NEW',
-      location: 'New York, USA',
-      country: 'United States',
-      images: ['/placeholder.jpg'],
-      seller: {
-        name: 'TechStore',
-        country: 'United States',
-        city: 'New York',
-        isVerified: true,
-      },
-      viewCount: 245,
-      createdAt: new Date(),
-    },
-    {
-      id: '2',
-      title: 'Sony WH-1000XM5 Headphones',
-      description: 'Premium noise-cancelling wireless headphones',
-      price: 349,
-      currency: 'USD',
-      condition: 'LIKE_NEW',
-      location: 'London, UK',
-      country: 'United Kingdom',
-      images: ['/placeholder.jpg'],
-      seller: {
-        name: 'AudioWorld',
-        country: 'United Kingdom',
-        city: 'London',
-        isVerified: true,
-      },
-      viewCount: 189,
-      createdAt: new Date(),
-    },
-    {
-      id: '3',
-      title: 'MacBook Air M2',
-      description: 'Ultra-thin laptop with Apple M2 chip',
-      price: 999,
-      currency: 'USD',
-      condition: 'EXCELLENT',
-      location: 'Toronto, Canada',
-      country: 'Canada',
-      images: ['/placeholder.jpg'],
-      seller: {
-        name: 'MacStore',
-        country: 'Canada',
-        city: 'Toronto',
-        isVerified: false,
-      },
-      viewCount: 156,
-      createdAt: new Date(),
-    },
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('')
+  const [condition, setCondition] = useState('')
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+
+  const categories = [
+    'Electronics',
+    'Fashion',
+    'Home & Garden',
+    'Sports & Outdoors',
+    'Books & Media',
+    'Automotive',
+    'Health & Beauty',
+    'Toys & Games',
+    'Art & Collectibles',
+    'Other',
   ]
+
+  const conditions = [
+    { value: 'NEW', label: 'New' },
+    { value: 'LIKE_NEW', label: 'Like New' },
+    { value: 'EXCELLENT', label: 'Excellent' },
+    { value: 'GOOD', label: 'Good' },
+    { value: 'FAIR', label: 'Fair' },
+    { value: 'POOR', label: 'Poor' },
+  ]
+
+  useEffect(() => {
+    fetchProducts()
+  }, [search, category, condition])
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (search) params.append('search', search)
+      if (category) params.append('category', category)
+      if (condition) params.append('condition', condition)
+
+      const response = await fetch(`/api/products?${params.toString()}`)
+      const data = await response.json()
+
+      if (data.success) {
+        setProducts(data.products)
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -81,13 +103,21 @@ export default function ProductsPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Browse Products
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Discover amazing products from sellers around the world
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Browse Products
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              Discover amazing products from sellers around the world
+            </p>
+          </div>
+          <Link href="/products/create">
+            <Button className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create Product
+            </Button>
+          </Link>
         </div>
 
         {/* Search and Filters */}
@@ -97,34 +127,82 @@ export default function ProductsPage() {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
+                <Input
                   type="text"
                   placeholder="Search products..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
                 />
               </div>
             </div>
 
             {/* Filters */}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-              <Button variant="outline" size="sm">
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Categories</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={condition} onValueChange={setCondition}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Conditions</SelectItem>
+                  {conditions.map((cond) => (
+                    <SelectItem key={cond.value} value={cond.value}>
+                      {cond.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
                 <Grid className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
                 <List className="h-4 w-4" />
               </Button>
             </div>
           </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {loading ? 'Loading...' : `${products.length} products found`}
+            </p>
+          </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          </div>
+        )}
+
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+        {!loading && (
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
+            {products.map((product) => (
+              <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer">
               <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
                 <div className="text-gray-400 text-sm">Product Image</div>
               </div>
@@ -180,12 +258,26 @@ export default function ProductsPage() {
           ))}
         </div>
 
-        {/* Load More */}
-        <div className="text-center mt-12">
-          <Button size="lg">
-            Load More Products
-          </Button>
-        </div>
+        {/* Empty State */}
+        {!loading && products.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <Search className="h-16 w-16 mx-auto" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              No products found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Try adjusting your search or filters
+            </p>
+            <Link href="/products/create">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create First Product
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
       <Footer />

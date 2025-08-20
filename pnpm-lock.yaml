@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@hookform/resolvers':
-        specifier: ^3.3.2
+        specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.62.0)
       '@next-auth/prisma-adapter':
         specifier: ^1.0.7
@@ -129,7 +129,7 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
       react-hook-form:
-        specifier: ^7.48.2
+        specifier: ^7.62.0
         version: 7.62.0(react@18.3.1)
       socket.io:
         specifier: ^4.7.4
@@ -150,7 +150,7 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
       zod:
-        specifier: ^3.22.4
+        specifier: ^3.25.76
         version: 3.25.76
       zustand:
         specifier: ^4.4.7
