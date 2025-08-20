@@ -210,7 +210,7 @@ export function ProductForm({ onSubmit, isLoading = false, initialData, isEditin
 
               <div className="space-y-2">
                 <Label htmlFor="currency">Currency</Label>
-                <Select onValueChange={(value) => setValue('currency', value)}>
+                <Select value={watch('currency')} onValueChange={(value) => setValue('currency', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
@@ -232,7 +232,7 @@ export function ProductForm({ onSubmit, isLoading = false, initialData, isEditin
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">Category *</Label>
-                <Select onValueChange={(value) => setValue('category', value)}>
+                <Select value={watch('category')} onValueChange={(value) => setValue('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -251,7 +251,7 @@ export function ProductForm({ onSubmit, isLoading = false, initialData, isEditin
 
               <div className="space-y-2">
                 <Label htmlFor="condition">Condition *</Label>
-                <Select onValueChange={(value) => setValue('condition', value as any)}>
+                <Select value={watch('condition')} onValueChange={(value) => setValue('condition', value as any)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
