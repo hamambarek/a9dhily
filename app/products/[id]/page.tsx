@@ -97,6 +97,50 @@ export default function ProductDetailPage() {
     }
   }
 
+  const handleEdit = () => {
+    if (product) {
+      window.location.href = `/products/${product.id}/edit`
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!product) return
+
+    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast({
+          title: 'Product Deleted',
+          description: 'Your product has been successfully deleted.',
+        })
+        // Redirect to products page
+        window.location.href = '/products'
+      } else {
+        toast({
+          title: 'Error',
+          description: data.error || 'Failed to delete product',
+          variant: 'destructive'
+        })
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to delete product',
+        variant: 'destructive'
+      })
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -188,6 +232,16 @@ export default function ProductDetailPage() {
                   {product.title}
                 </h1>
                 <div className="flex space-x-2">
+                  {session?.user?.id === product.seller.id && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={handleEdit}>
+                        Edit
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={handleDelete}>
+                        Delete
+                      </Button>
+                    </>
+                  )}
                   <Button variant="outline" size="sm">
                     <Heart className="h-4 w-4" />
                   </Button>

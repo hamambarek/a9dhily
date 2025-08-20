@@ -53,10 +53,12 @@ const conditions = [
 interface ProductFormProps {
   onSubmit: (data: ProductFormData & { images: string[] }) => void
   isLoading?: boolean
+  initialData?: any
+  isEditing?: boolean
 }
 
-export function ProductForm({ onSubmit, isLoading = false }: ProductFormProps) {
-  const [images, setImages] = useState<string[]>([])
+export function ProductForm({ onSubmit, isLoading = false, initialData, isEditing = false }: ProductFormProps) {
+  const [images, setImages] = useState<string[]>(initialData?.images || [])
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const { toast } = useToast()
 
@@ -69,7 +71,15 @@ export function ProductForm({ onSubmit, isLoading = false }: ProductFormProps) {
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      currency: 'USD',
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      price: initialData?.price || 0,
+      currency: initialData?.currency || 'USD',
+      category: initialData?.category || '',
+      condition: initialData?.condition || 'NEW',
+      location: initialData?.location || '',
+      country: initialData?.country || '',
+      city: initialData?.city || '',
     },
   })
 
@@ -135,9 +145,9 @@ export function ProductForm({ onSubmit, isLoading = false }: ProductFormProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Create New Product</CardTitle>
+        <CardTitle>{isEditing ? 'Edit Product' : 'Create New Product'}</CardTitle>
         <CardDescription>
-          Add your product details and images to start selling
+          {isEditing ? 'Update your product details and images' : 'Add your product details and images to start selling'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -356,7 +366,7 @@ export function ProductForm({ onSubmit, isLoading = false }: ProductFormProps) {
               Save as Draft
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Product'}
+              {isLoading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Product' : 'Create Product')}
             </Button>
           </div>
         </form>
