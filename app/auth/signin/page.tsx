@@ -11,7 +11,6 @@ import {
   Lock, 
   Eye, 
   EyeOff,
-  Github,
   Chrome
 } from 'lucide-react'
 
@@ -210,16 +209,6 @@ export default function SignInPage() {
               >
                 <Chrome className="h-5 w-5 mr-2" />
                 Continue with Google
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={() => handleOAuthSignIn('github')}
-                disabled={isLoading}
-              >
-                <Github className="h-5 w-5 mr-2" />
-                Continue with GitHub
               </Button>
             </div>
 

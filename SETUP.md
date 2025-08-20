@@ -63,17 +63,7 @@ GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
-#### GitHub OAuth
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Create a new OAuth App
-3. Set Homepage URL: `http://localhost:3000`
-4. Set Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
 
-```bash
-# GitHub OAuth
-GITHUB_ID="your-github-client-id"
-GITHUB_SECRET="your-github-client-secret"
-```
 
 ### 💳 Payment Integration (Stripe)
 

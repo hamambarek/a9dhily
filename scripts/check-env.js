@@ -43,9 +43,7 @@ const requiredVars = {
   oauth: [
     // Optional - will show warnings if not set
     'GOOGLE_CLIENT_ID',
-    'GOOGLE_CLIENT_SECRET',
-    'GITHUB_ID',
-    'GITHUB_SECRET'
+    'GOOGLE_CLIENT_SECRET'
   ],
   payment: [
     // Optional - will show warnings if not set
