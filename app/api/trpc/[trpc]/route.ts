@@ -8,8 +8,7 @@ const handler = (req: Request) =>
     req,
     router: appRouter,
     createContext: async () => {
-      const { req } = { req } as any
-      return createTRPCContext({ req, res: {} as any })
+      return createTRPCContext({ req: req as any, res: {} as any, info: {} as any })
     },
     onError:
       process.env.NODE_ENV === 'development'

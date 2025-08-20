@@ -2,7 +2,7 @@ import Stripe from 'stripe'
 
 // Initialize Stripe with secret key
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2023-10-16',
   typescript: true,
 })
 
@@ -11,7 +11,7 @@ export const STRIPE_CONFIG = {
   currency: 'usd',
   payment_method_types: ['card'],
   capture_method: 'automatic',
-} as const
+}
 
 // Payment intent creation
 export async function createPaymentIntent(amount: number, metadata: Record<string, string>) {
@@ -20,7 +20,7 @@ export async function createPaymentIntent(amount: number, metadata: Record<strin
       amount: Math.round(amount * 100), // Convert to cents
       currency: STRIPE_CONFIG.currency,
       payment_method_types: STRIPE_CONFIG.payment_method_types,
-      capture_method: STRIPE_CONFIG.capture_method,
+      capture_method: STRIPE_CONFIG.capture_method as 'automatic' | 'manual',
       metadata,
     })
 

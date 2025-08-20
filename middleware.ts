@@ -40,7 +40,7 @@ function isRateLimited(ip: string): boolean {
 // Clean up old rate limit records
 setInterval(() => {
   const now = Date.now()
-  for (const [ip, record] of rateLimitStore.entries()) {
+  for (const [ip, record] of Array.from(rateLimitStore.entries())) {
     if (now > record.resetTime) {
       rateLimitStore.delete(ip)
     }

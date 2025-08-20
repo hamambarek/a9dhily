@@ -25,6 +25,13 @@ export async function POST(request: NextRequest) {
 
     const event = result.event
 
+    if (!event) {
+      return NextResponse.json(
+        { error: 'No event found' },
+        { status: 400 }
+      )
+    }
+
     // Handle different event types
     switch (event.type) {
       case 'payment_intent.succeeded':
@@ -110,7 +117,7 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
         status: 'PENDING',
       },
       data: {
-        status: 'FAILED',
+        status: 'CANCELLED',
         failedAt: new Date(),
       },
     })
@@ -127,7 +134,7 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
           userId: transaction.buyerId,
           type: 'PAYMENT_RECEIVED', // We'll reuse this type for now
           title: 'Payment Failed',
-          message: `Payment failed for ${transaction.product.name}`,
+          message: `Payment failed for ${transaction.product.title}`,
           data: {
             productId: transaction.productId,
             amount: transaction.amount,

@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Search, 
-  Filter, 
   Grid, 
   List,
   MapPin,
@@ -48,7 +47,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
   const [condition, setCondition] = useState('')
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const categories = [
     'Electronics',
@@ -203,60 +202,62 @@ export default function ProductsPage() {
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
             {products.map((product) => (
               <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-              <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
-                <div className="text-gray-400 text-sm">Product Image</div>
-              </div>
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-lg line-clamp-2">
-                    {product.title}
-                  </CardTitle>
-                  <Badge variant={product.condition === 'NEW' ? 'default' : 'secondary'}>
-                    {product.condition}
-                  </Badge>
+                <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
+                  <div className="text-gray-400 text-sm">Product Image</div>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${product.price}
-                </p>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-4">
-                  {product.description}
-                </p>
-                
-                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {product.location}
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <CardTitle className="text-lg line-clamp-2">
+                      {product.title}
+                    </CardTitle>
+                    <Badge variant={product.condition === 'NEW' ? 'default' : 'secondary'}>
+                      {product.condition}
+                    </Badge>
                   </div>
-                  <div className="flex items-center">
-                    <Eye className="h-4 w-4 mr-1" />
-                    {product.viewCount}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 bg-gray-300 rounded-full mr-2"></div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {product.seller.name}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {product.seller.city}, {product.seller.country}
-                      </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    ${product.price}
+                  </p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-4">
+                    {product.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {product.location}
+                    </div>
+                    <div className="flex items-center">
+                      <Eye className="h-4 w-4 mr-1" />
+                      {product.viewCount}
                     </div>
                   </div>
-                  {product.seller.isVerified && (
-                    <Badge variant="success" className="text-xs">
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 bg-gray-300 rounded-full mr-2"></div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {product.seller.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {product.seller.city}, {product.seller.country}
+                        </div>
+                      </div>
+                    </div>
+                    {product.seller.isVerified && (
+                      <Badge variant="outline" className="text-xs">
+                        <Star className="h-3 w-3 mr-1" />
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
         {!loading && products.length === 0 && (

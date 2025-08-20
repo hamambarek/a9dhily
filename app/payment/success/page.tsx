@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Navigation } from '@/components/layout/navigation'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle, Package, CreditCard, ArrowRight } from 'lucide-react'
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const [isLoading, setIsLoading] = useState(true)
@@ -115,5 +115,23 @@ export default function PaymentSuccessPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }
