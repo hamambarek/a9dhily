@@ -201,7 +201,8 @@ export default function ProductsPage() {
         {!loading && (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
             {products.map((product) => (
-              <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link key={product.id} href={`/products/${product.id}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
                   <div className="text-gray-400 text-sm">Product Image</div>
                 </div>
@@ -255,6 +256,7 @@ export default function ProductsPage() {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}
