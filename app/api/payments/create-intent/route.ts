@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
         buyerId: session.user.id,
         sellerId,
         amount,
+        platformFee: 0, // No platform fee for testing
         status: 'PENDING',
         paymentIntentId: result.paymentIntentId!,
       },
