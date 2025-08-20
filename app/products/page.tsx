@@ -26,6 +26,7 @@ interface Product {
   description: string
   price: number
   currency: string
+  category: string
   condition: string
   location: string
   country: string
@@ -197,29 +198,44 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {/* Products Grid */}
+        {/* Products Grid/List */}
         {!loading && (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
             {products.map((product) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
-                  <div className="text-gray-400 text-sm">Product Image</div>
+                <Card className={`hover:shadow-lg transition-shadow cursor-pointer ${viewMode === 'list' ? 'flex' : ''}`}>
+                <div className={`${viewMode === 'list' ? 'w-32 h-32' : 'aspect-square'} bg-gray-200 dark:bg-gray-700 rounded-t-lg overflow-hidden flex-shrink-0`}>
+                  {product.images && product.images.length > 0 ? (
+                    <img
+                      src={product.images[0]}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="text-gray-400 text-sm">No Image</div>
+                    </div>
+                  )}
                 </div>
-                <CardHeader className="pb-3">
+                <CardHeader className={`pb-3 ${viewMode === 'list' ? 'flex-1' : ''}`}>
                   <div className="flex justify-between items-start mb-2">
                     <CardTitle className="text-lg line-clamp-2">
                       {product.title}
                     </CardTitle>
-                    <Badge variant={product.condition === 'NEW' ? 'default' : 'secondary'}>
-                      {product.condition}
-                    </Badge>
+                    <div className="flex flex-col gap-1">
+                      <Badge variant={product.condition === 'NEW' ? 'default' : 'secondary'} className="text-xs">
+                        {product.condition}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {product.category}
+                      </Badge>
+                    </div>
                   </div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ${product.price}
+                    {product.currency === 'USD' ? '$' : product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : product.currency}{product.price}
                   </p>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className={`pt-0 ${viewMode === 'list' ? 'flex-1' : ''}`}>
                   <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-4">
                     {product.description}
                   </p>
