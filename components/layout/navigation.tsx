@@ -14,7 +14,8 @@ import {
   LogOut,
   Sun,
   Moon,
-  CreditCard
+  CreditCard,
+  Shield
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState, useEffect } from 'react'
@@ -65,63 +66,76 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/search"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Search
-            </Link>
-            <Link
-              href="/products"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Products
-            </Link>
-                                  <Link
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Main Navigation */}
+            <div className="flex items-center space-x-6">
+              <Link
+                href="/search"
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+              >
+                Search
+              </Link>
+              <Link
+                href="/products"
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+              >
+                Browse
+              </Link>
+              <Link
                 href="/products/create"
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
               >
                 Sell
               </Link>
-                          <Link 
-              href="/dashboard" 
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              href="/profile" 
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Profile
-            </Link>
-            {session?.user?.role === 'ADMIN' && (
               <Link 
-                href="/admin" 
+                href="/shipping/track" 
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+              >
+                Track
+              </Link>
+            </div>
+
+            {/* User Navigation */}
+            {session && (
+              <div className="flex items-center space-x-6 ml-6 pl-6 border-l border-gray-200 dark:border-gray-700">
+                <Link 
+                  href="/dashboard" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/profile" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Profile
+                </Link>
+                {session?.user?.role === 'ADMIN' && (
+                  <Link 
+                    href="/admin" 
+                    className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    Admin
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Info Navigation */}
+            <div className="flex items-center space-x-6 ml-6 pl-6 border-l border-gray-200 dark:border-gray-700">
+              <Link 
+                href="/about" 
                 className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                Admin
+                About
               </Link>
-            )}
-            <Link 
-              href="/about" 
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              About
-            </Link>
-            <Link 
-              href="/shipping/track" 
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Track Package
-            </Link>
-            <Link 
-              href="/help" 
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Help
-            </Link>
+              <Link 
+                href="/help" 
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                Help
+              </Link>
+            </div>
           </div>
 
           {/* Right side - Auth & Theme */}
@@ -151,12 +165,7 @@ export function Navigation() {
                     Dashboard
                   </Button>
                 </Link>
-                <Link href="/payment-test">
-                  <Button variant="ghost" size="sm">
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Test Payment
-                  </Button>
-                </Link>
+
                 <Link href="/messages">
                   <Button variant="ghost" size="sm" className="relative">
                     <MessageSquare className="h-5 w-5 mr-2" />
@@ -212,43 +221,89 @@ export function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="flex flex-col space-y-4">
-              <Link 
-                href="/products" 
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Products
-              </Link>
-              <Link 
-                href="/about" 
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link 
-                href="/help" 
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Help
-              </Link>
+              {/* Main Navigation */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4">
+                  Main
+                </h4>
+                <Link 
+                  href="/search" 
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Search
+                </Link>
+                <Link 
+                  href="/products" 
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Browse
+                </Link>
+                <Link 
+                  href="/products/create" 
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sell
+                </Link>
+                <Link 
+                  href="/shipping/track" 
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Track Package
+                </Link>
+              </div>
+
+              {/* Info Navigation */}
+              <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4">
+                  Info
+                </h4>
+                <Link 
+                  href="/about" 
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  About
+                </Link>
+                <Link 
+                  href="/help" 
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Help
+                </Link>
+              </div>
               
               {/* Mobile Auth */}
               {session ? (
                 <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4">
+                    Account
+                  </h4>
                   <Link href="/dashboard">
                     <Button variant="ghost" className="w-full justify-start">
                       <User className="h-5 w-5 mr-2" />
                       Dashboard
                     </Button>
                   </Link>
-                  <Link href="/payment-test">
+                  <Link href="/profile">
                     <Button variant="ghost" className="w-full justify-start">
-                      <CreditCard className="h-5 w-5 mr-2" />
-                      Test Payment
+                      <Settings className="h-5 w-5 mr-2" />
+                      Profile
                     </Button>
                   </Link>
+                  {session?.user?.role === 'ADMIN' && (
+                    <Link href="/admin">
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Shield className="h-5 w-5 mr-2" />
+                        Admin
+                      </Button>
+                    </Link>
+                  )}
+
                   <Link href="/messages">
                     <Button variant="ghost" className="w-full justify-start relative">
                       <MessageSquare className="h-5 w-5 mr-2" />
