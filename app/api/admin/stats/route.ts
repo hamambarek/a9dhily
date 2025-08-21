@@ -1,0 +1,136 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { db } from '@/lib/db'
+
+export const dynamic = 'force-dynamic'
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 })
+    }
+
+    // Get comprehensive platform statistics
+    const [
+      totalUsers,
+      totalProducts,
+      totalTransactions,
+      activeUsers,
+      pendingVerifications,
+      completedTransactions,
+      totalRevenue
+    ] = await Promise.all([
+      db.user.count(),
+      db.product.count(),
+      db.transaction.count(),
+      db.user.count({
+        where: {
+          lastActive: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
+          }
+        }
+      }),
+      db.verificationRequest.count({
+        where: { status: 'PENDING' }
+      }),
+      db.transaction.count({
+        where: { status: 'COMPLETED' }
+      }),
+      db.transaction.aggregate({
+        where: { status: 'COMPLETED' },
+        _sum: { amount: true }
+      })
+    ])
+
+    // Get recent activity (last 10 activities)
+    const recentActivity = await db.transaction.findMany({
+      take: 10,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        buyer: { select: { name: true } },
+        seller: { select: { name: true } },
+        product: { select: { title: true } }
+      }
+    })
+
+    // Get top performing products
+    const topProducts = await db.product.findMany({
+      take: 10,
+      orderBy: { viewCount: 'desc' },
+      include: {
+        _count: {
+          select: { transactions: true }
+        },
+        seller: { select: { name: true } }
+      }
+    })
+
+    // Get user growth data (last 30 days)
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const userGrowth = await db.user.groupBy({
+      by: ['createdAt'],
+      where: {
+        createdAt: { gte: thirtyDaysAgo }
+      },
+      _count: { id: true }
+    })
+
+    // Get revenue data (last 30 days)
+    const revenueData = await db.transaction.groupBy({
+      by: ['createdAt'],
+      where: {
+        status: 'COMPLETED',
+        createdAt: { gte: thirtyDaysAgo }
+      },
+      _sum: { amount: true }
+    })
+
+    // Format recent activity
+    const formattedActivity = recentActivity.map(transaction => ({
+      type: 'transaction',
+      description: `${transaction.buyer.name} purchased ${transaction.product.title} from ${transaction.seller.name}`,
+      timestamp: transaction.createdAt,
+      amount: transaction.amount
+    }))
+
+    // Format top products
+    const formattedTopProducts = topProducts.map(product => ({
+      id: product.id,
+      title: product.title,
+      revenue: product._count.transactions * Number(product.price),
+      sales: product._count.transactions,
+      views: product.viewCount,
+      seller: product.seller.name
+    }))
+
+    const stats = {
+      totalUsers,
+      totalProducts,
+      totalTransactions,
+      totalRevenue: totalRevenue._sum.amount || 0,
+      activeUsers,
+      pendingVerifications,
+      completedTransactions,
+      recentActivity: formattedActivity,
+      topProducts: formattedTopProducts,
+      userGrowth: userGrowth.map(item => ({
+        date: item.createdAt,
+        count: item._count.id
+      })),
+      revenueData: revenueData.map(item => ({
+        date: item.createdAt,
+        revenue: item._sum.amount || 0
+      }))
+    }
+
+    return NextResponse.json({
+      success: true,
+      stats
+    })
+  } catch (error) {
+    console.error('Error fetching admin stats:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

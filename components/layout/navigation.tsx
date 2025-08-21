@@ -72,6 +72,14 @@ export function Navigation() {
             >
               Profile
             </Link>
+            {session?.user?.role === 'ADMIN' && (
+              <Link 
+                href="/admin" 
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                Admin
+              </Link>
+            )}
             <Link 
               href="/about" 
               className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
