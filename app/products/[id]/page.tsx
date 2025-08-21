@@ -26,6 +26,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/hooks/use-toast'
 import { ReviewsList } from '@/components/reviews/reviews-list'
+import { ShippingCalculator } from '@/components/shipping/shipping-calculator'
 
 interface Product {
   id: string
@@ -434,6 +435,21 @@ export default function ProductDetailPage() {
                   <span>Quality Guarantee</span>
                 </div>
               </div>
+            </div>
+
+            {/* Shipping Calculator */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+              <ShippingCalculator
+                productId={product.id}
+                productTitle={product.title}
+                productPrice={Number(product.price)}
+                fromCountry={product.seller.country}
+                fromCity={product.seller.city}
+                defaultWeight={1.0}
+                onShippingSelect={(option) => {
+                  console.log('Selected shipping option:', option)
+                }}
+              />
             </div>
 
             {/* Reviews Section */}

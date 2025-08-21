@@ -102,6 +102,11 @@ model Product {
   model       String?       // Product model
   year        Int?          // Product year (for electronics, vehicles, etc.)
   searchScore Int           @default(0) // For search relevance
+  weight      Decimal?      @db.Decimal(8, 2) // Product weight in kg
+  dimensions  String?       // Dimensions (LxWxH in cm)
+  shippingClass String?     // Shipping class (standard, express, fragile, etc.)
+  freeShipping Boolean      @default(false) // Free shipping available
+  shippingCost Decimal?     @db.Decimal(10, 2) // Base shipping cost
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -149,6 +154,7 @@ model Transaction {
   seller          User              @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Cascade)
   escrowAccount   EscrowAccount?    @relation(fields: [escrowAccountId], references: [id])
   messages        Message[]
+  shipment        Shipment?
 
   @@index([buyerId])
   @@index([sellerId])
@@ -172,6 +178,71 @@ model EscrowAccount {
 
   @@unique([userId, currency])
   @@index([userId])
+}
+
+model ShippingProvider {
+  id            String    @id @default(cuid())
+  name          String    // DHL, FedEx, UPS, etc.
+  code          String    @unique // Provider code
+  isActive      Boolean   @default(true)
+  supportedCountries String[] // Array of country codes
+  baseRate      Decimal   @db.Decimal(10, 2) // Base shipping rate
+  ratePerKg     Decimal   @db.Decimal(10, 2) // Rate per kg
+  estimatedDays Int       // Estimated delivery days
+  trackingUrl   String?   // Tracking URL template
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  shipments     Shipment[]
+
+  @@index([isActive])
+}
+
+model Shipment {
+  id                String           @id @default(cuid())
+  transactionId     String           @unique
+  providerId        String
+  trackingNumber    String?          @unique
+  status            ShipmentStatus   @default(PENDING)
+  fromAddress       String           // Seller address
+  toAddress         String           // Buyer address
+  weight            Decimal?         @db.Decimal(8, 2)
+  dimensions        String?          // LxWxH in cm
+  shippingCost      Decimal          @db.Decimal(10, 2)
+  insuranceAmount   Decimal?         @db.Decimal(10, 2)
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  notes             String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  transaction       Transaction      @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  provider          ShippingProvider @relation(fields: [providerId], references: [id])
+  trackingEvents    TrackingEvent[]
+
+  @@index([status])
+  @@index([trackingNumber])
+  @@index([transactionId])
+}
+
+model TrackingEvent {
+  id          String    @id @default(cuid())
+  shipmentId  String
+  status      String    // In Transit, Out for Delivery, Delivered, etc.
+  location    String?   // Current location
+  description String?   // Event description
+  timestamp   DateTime
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  shipment    Shipment  @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+  @@index([timestamp])
 }
 
 model Message {
@@ -288,6 +359,18 @@ enum TransactionStatus {
   CANCELLED
   DISPUTED
   REFUNDED
+}
+
+enum ShipmentStatus {
+  PENDING
+  LABEL_CREATED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  RETURNED
+  CANCELLED
+  EXCEPTION
 }
 
 enum MessageType {
