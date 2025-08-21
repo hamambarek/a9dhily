@@ -43,8 +43,10 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
+  bio           String?   // User bio/description
   password      String?
   phone         String?
+  website       String?   // Personal website
   country       String?
   city          String?
   address       String?
@@ -55,6 +57,7 @@ model User {
   role          UserRole  @default(USER)
   averageRating Decimal?  @db.Decimal(3, 2) // Average rating from reviews
   totalReviews  Int       @default(0)       // Total number of reviews received
+  lastActive    DateTime  @default(now())    // Last activity timestamp
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
