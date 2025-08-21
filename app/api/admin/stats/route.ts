@@ -55,6 +55,20 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    // Get recent user registrations as activity if no transactions
+    let recentUserActivity: any[] = []
+    if (recentActivity.length === 0) {
+      recentUserActivity = await db.user.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          createdAt: true
+        }
+      })
+    }
+
     // Get top performing products
     const topProducts = await db.product.findMany({
       take: 10,
@@ -66,6 +80,21 @@ export async function GET(request: NextRequest) {
         seller: { select: { name: true } }
       }
     })
+
+    // Get recent products if no products with views
+    let recentProducts: any[] = []
+    if (topProducts.length === 0) {
+      recentProducts = await db.product.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          _count: {
+            select: { transactions: true }
+          },
+          seller: { select: { name: true } }
+        }
+      })
+    }
 
     // Get user growth data (last 30 days)
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
@@ -88,22 +117,44 @@ export async function GET(request: NextRequest) {
     })
 
     // Format recent activity
-    const formattedActivity = recentActivity.map(transaction => ({
-      type: 'transaction',
-      description: `${transaction.buyer.name} purchased ${transaction.product.title} from ${transaction.seller.name}`,
-      timestamp: transaction.createdAt,
-      amount: transaction.amount
-    }))
+    let formattedActivity: any[] = []
+    if (recentActivity.length > 0) {
+      formattedActivity = recentActivity.map(transaction => ({
+        type: 'transaction',
+        description: `${transaction.buyer.name} purchased ${transaction.product.title} from ${transaction.seller.name}`,
+        timestamp: transaction.createdAt,
+        amount: transaction.amount
+      }))
+    } else if (recentUserActivity.length > 0) {
+      formattedActivity = recentUserActivity.map(user => ({
+        type: 'user',
+        description: `${user.name} joined the platform`,
+        timestamp: user.createdAt,
+        amount: null
+      }))
+    }
 
     // Format top products
-    const formattedTopProducts = topProducts.map(product => ({
-      id: product.id,
-      title: product.title,
-      revenue: product._count.transactions * Number(product.price),
-      sales: product._count.transactions,
-      views: product.viewCount,
-      seller: product.seller.name
-    }))
+    let formattedTopProducts: any[] = []
+    if (topProducts.length > 0) {
+      formattedTopProducts = topProducts.map(product => ({
+        id: product.id,
+        title: product.title,
+        revenue: product._count.transactions * Number(product.price),
+        sales: product._count.transactions,
+        views: product.viewCount,
+        seller: product.seller.name
+      }))
+    } else if (recentProducts.length > 0) {
+      formattedTopProducts = recentProducts.map(product => ({
+        id: product.id,
+        title: product.title,
+        revenue: 0,
+        sales: 0,
+        views: product.viewCount || 0,
+        seller: product.seller.name
+      }))
+    }
 
     const stats = {
       totalUsers,

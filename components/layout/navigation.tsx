@@ -17,14 +17,38 @@ import {
   CreditCard
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function Navigation() {
   const { data: session, status } = useSession()
   const { theme, setTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+
+  // Fetch unread message count
+  useEffect(() => {
+    if (session?.user) {
+      fetchUnreadCount()
+    } else {
+      setUnreadCount(0)
+    }
+  }, [session])
+
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await fetch('/api/messages/unread-count')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setUnreadCount(data.unreadCount)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching unread count:', error)
+    }
+  }
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
@@ -137,9 +161,11 @@ export function Navigation() {
                   <Button variant="ghost" size="sm" className="relative">
                     <MessageSquare className="h-5 w-5 mr-2" />
                     Messages
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
-                      3
-                    </Badge>
+                    {unreadCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </Badge>
+                    )}
                   </Button>
                 </Link>
                 <Button 
@@ -227,9 +253,11 @@ export function Navigation() {
                     <Button variant="ghost" className="w-full justify-start relative">
                       <MessageSquare className="h-5 w-5 mr-2" />
                       Messages
-                      <Badge className="absolute top-2 right-2 h-5 w-5 p-0 text-xs">
-                        3
-                      </Badge>
+                      {unreadCount > 0 && (
+                        <Badge className="absolute top-2 right-2 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </Badge>
+                      )}
                     </Button>
                   </Link>
                   <Button 
